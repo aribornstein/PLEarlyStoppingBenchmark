@@ -189,9 +189,12 @@ def cli_main(args=None):
 
     parser = ArgumentParser()
     parser.add_argument("--dataset", default="cifar10", type=str, choices=["cifar10", "stl10", "imagenet"])
-    parser.add_argument("--stopping_threshold", default=None, type=float)
-    parser.add_argument("--divergence_threshold", default=None, type=float)
-    parser.add_argument("--check_finite", default=False, type=bool)
+    parser.add_argument("--es_monitor", default="val_loss", type=str,)
+    parser.add_argument("--es_stopping_threshold", default=None, type=float)
+    parser.add_argument("--es_divergence_threshold", default=None, type=float)
+    parser.add_argument("--es_check_finite", default=None, type=float())
+    parser.add_argument("--es_min_delta", default=False, type=bool)
+    parser.add_argument("--es_mode", default="min", type=str, choices=["min", "max"])
 
     script_args, _ = parser.parse_known_args(args)
 
@@ -217,10 +220,12 @@ def cli_main(args=None):
     model = VAE(**vars(args))
 
     early_stopping = EarlyStopping(
-      monitor="val_loss",
-      stopping_threshold=args.stopping_threshold,
-      divergence_threshold=args.divergence_threshold,
-      check_finite=args.check_finite,
+      monitor=args.es_monitor,
+      mode=args.es_mode,
+      min_delta=args.es_min_delta,
+      stopping_threshold=args.es_stopping_threshold,
+      divergence_threshold=args.es_divergence_threshold,
+      check_finite=args.es_check_finite
     )
 
     trainer = pl.Trainer.from_argparse_args(args, callbacks=[early_stopping])
