@@ -192,8 +192,8 @@ def cli_main(args=None):
     parser.add_argument("--es_monitor", default="val_loss", type=str,)
     parser.add_argument("--es_stopping_threshold", default=None, type=float)
     parser.add_argument("--es_divergence_threshold", default=None, type=float)
-    parser.add_argument("--es_check_finite", default=None, type=float())
-    parser.add_argument("--es_min_delta", default=False, type=bool)
+    parser.add_argument("--es_check_finite",default=False, type=bool)
+    parser.add_argument("--es_min_delta", default=0.0, type=float())
     parser.add_argument("--es_mode", default="min", type=str, choices=["min", "max"])
 
     script_args, _ = parser.parse_known_args(args)
