@@ -2,6 +2,7 @@ import os
 from argparse import ArgumentParser
 
 import flash
+import pytorch_lightning as pl
 from torchvision.datasets import CIFAR100
 from pytorch_lightning.callbacks import EarlyStopping
 from flash.core.classification import Labels
@@ -20,8 +21,8 @@ if __name__ == "__main__":
     parser.add_argument("--es_check_finite",default=False, type=bool)
     parser.add_argument("--es_min_delta", default=0.0, type=float)
     parser.add_argument("--es_mode", default="min", type=str, choices=["min", "max"])
-    parser = flash.Trainer.add_argparse_args(parser)
-    args = parser.parse_args(args)
+    parser = pl.Trainer.add_argparse_args(parser)
+    args = parser.parse_args()
 
 
     def unpack_torchvision(data):
