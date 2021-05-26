@@ -14,6 +14,7 @@ from flash.image import ImageClassificationData, ImageClassifier
 if __name__ == "__main__":
 
     parser = ArgumentParser()
+    parser.add_argument('--learning_rate', type=float, default=1e-3)
     parser.add_argument("--backbone", default="resnet18", type=str)
     parser.add_argument("--es_monitor", default="val_loss", type=str,)
     parser.add_argument("--es_stopping_threshold", default=None, type=float)
@@ -42,7 +43,7 @@ if __name__ == "__main__":
                                                     val_split=.1)
 
     # 2. Build the model
-    model = ImageClassifier(backbone=args.backbone, num_classes=100, serializer=Labels())
+    model = ImageClassifier(backbone=args.backbone, learning_rate=args.learning_rate, num_classes=100, serializer=Labels())
 
     # 3. Early stopping call back 
     early_stopping = EarlyStopping(
