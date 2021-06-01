@@ -40,7 +40,8 @@ if __name__ == "__main__":
                                                                                         train_default_transforms([32, 32])),
                                                     val_transform=merge_transforms({"pre_tensor_transform":unpack_torchvision},
                                                                                         default_transforms([32, 32])),
-                                                    val_split=.1)
+                                                    val_split=.1,
+                                                    batch_size=128)
 
     # 2. Build the model
     model = ImageClassifier(backbone=args.backbone, learning_rate=args.learning_rate, num_classes=100, serializer=Labels())
@@ -59,4 +60,4 @@ if __name__ == "__main__":
     trainer = flash.Trainer.from_argparse_args(args, callbacks=[early_stopping])
 
     # 5. Train the model
-    trainer.finetune(model, datamodule=datamodule, strategy=FreezeUnfreeze(unfreeze_epoch=1))
+    trainer.finetune(model, datamodule=datamodule)
