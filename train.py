@@ -60,4 +60,4 @@ if __name__ == "__main__":
     trainer = flash.Trainer.from_argparse_args(args, callbacks=[early_stopping])
 
     # 5. Train the model
-    trainer.finetune(model, datamodule=datamodule)
+    trainer.finetune(model, datamodule=datamodule, strategy="no_freeze")
