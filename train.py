@@ -1,9 +1,10 @@
 import os
+from torch.optim.lr_scheduler import MultiStepLR
 from argparse import ArgumentParser
 
 import flash
 import pytorch_lightning as pl
-from torchvision.datasets import CIFAR100
+from torchvision.datasets import CIFAR10
 from pytorch_lightning.callbacks import EarlyStopping
 from flash.core.classification import Labels
 from flash.core.finetuning import FreezeUnfreeze
@@ -11,7 +12,15 @@ from flash.core.data.transforms import merge_transforms
 from flash.image.classification.transforms import default_transforms, train_default_transforms
 from flash.image import ImageClassificationData, ImageClassifier
 
+
+# resize inputs 
+# 
+
+
 if __name__ == "__main__":
+    
+    image_size = 128
+
 
     parser = ArgumentParser()
     parser.add_argument('--learning_rate', type=float, default=1e-3)
@@ -33,18 +42,19 @@ if __name__ == "__main__":
         return data
 
     # 1. Load the data
-    train_dataset = CIFAR100(train=True, download=True, root='.')
+    train_dataset = CIFAR10(train=True, download=True, root='.')
 
     datamodule = ImageClassificationData.from_datasets(train_dataset=train_dataset, 
                                                     train_transform=merge_transforms({"pre_tensor_transform":unpack_torchvision},
-                                                                                        train_default_transforms([32, 32])),
+                                                                                        train_default_transforms([image_size, image_size])),
                                                     val_transform=merge_transforms({"pre_tensor_transform":unpack_torchvision},
-                                                                                        default_transforms([32, 32])),
+                                                                                        default_transforms([image_size, image_size])),
                                                     val_split=.1,
                                                     batch_size=128)
 
     # 2. Build the model
-    model = ImageClassifier(backbone=args.backbone, learning_rate=args.learning_rate, num_classes=100, serializer=Labels())
+    model = ImageClassifier(backbone=args.backbone, learning_rate=args.learning_rate, num_classes=10, 
+                            scheduler=MultiStepLR, scheduler_kwargs={"milestones": [50, 75]}, serializer=Labels())
 
     # 3. Early stopping call back 
     early_stopping = EarlyStopping(
@@ -60,4 +70,4 @@ if __name__ == "__main__":
     trainer = flash.Trainer.from_argparse_args(args, callbacks=[early_stopping])
 
     # 5. Train the model
-    trainer.finetune(model, datamodule=datamodule, strategy="no_freeze")
+    trainer.finetune(model, datamodule=datamodule, strategy=FreezeUnfreeze(unfreeze_epoch=7)))
